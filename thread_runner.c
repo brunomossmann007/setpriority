@@ -6,11 +6,18 @@
 #include <linux/sched.h>
 
 //volatile int running = 1;
+char *buffer = NULL;
+
+int index = 0;
+
 
 void *run(void *data)
-{
-	printf("Inicia thread\n");
+{ms
+	int id = (int)data;
+	printf("Inicia thread %d\n", id);
 
+	buffer[pointer] = 'A';
+	index++;
 	return 0;
 }
 
@@ -90,11 +97,12 @@ int main(int argc, char **argv)
 	POLICY_PRIORITY = atoi(argv[4]);
 
 	pthread_t thr[N_THREADS];
+	buffer = (char*) malloc((sizeof(char)) * BUFFER_SIZE * 1024);
 
 	printf("Inicio: %d %d %d %d\n", N_THREADS, BUFFER_SIZE, POLICY_TYPE, POLICY_PRIORITY);
 
 	for(int i = 0; i < N_THREADS; i++) {
-			pthread_create(&thr[i], NULL, run, NULL);
+			pthread_create(&thr[i], NULL, run, (void*)i) ;
 	}
 
 	for(int i = 0; i < N_THREADS; i++) {
