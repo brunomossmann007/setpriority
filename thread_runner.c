@@ -5,11 +5,11 @@
 #include <string.h>
 #include <linux/sched.h>
 
-volatile int running = 1;
+//volatile int running = 1;
 
 void *run(void *data)
 {
-	while (running);
+	printf("Inicia thread\n");
 
 	return 0;
 }
@@ -74,21 +74,33 @@ int setpriority(pthread_t *thr, int newpolicy, int newpriority)
 
 int main(int argc, char **argv)
 {
-	int timesleep;
-	pthread_t thr;
+	int N_THREADS = 0;
+	int BUFFER_SIZE = 0;
+	int POLICY_TYPE = 0;
+	int POLICY_PRIORITY = 0;
 
-	if (argc < 2){
-		printf("usage: ./%s <execution_time>\n\n", argv[0]);
-
+	if (argc < 5) {
+		printf("usage: ./%s <numero_de_threads> <tamanho_do_buffer_global_em_kilobytes> <politica> <prioridade>\n\n", argv[0]);
 		return 0;
 	}
 
-	timesleep = atoi(argv[1]);
-	pthread_create(&thr, NULL, run, NULL);
-	setpriority(&thr, SCHED_FIFO, 1);
-	sleep(timesleep);
-	running = 0;
-	pthread_join(thr, NULL);
+	N_THREADS = atoi(argv[1]);
+	BUFFER_SIZE = atoi(argv[2]);
+	POLICY_TYPE = atoi(argv[3]);
+	POLICY_PRIORITY = atoi(argv[4]);
 
+	pthread_t thr[N_THREADS];
+
+	printf("Inicio: %d %d %d %d\n", N_THREADS, BUFFER_SIZE, POLICY_TYPE, POLICY_PRIORITY);
+
+	for(int i = 0; i < N_THREADS; i++) {
+			pthread_create(&thr[i], NULL, run, NULL);
+	}
+
+	for(int i = 0; i < N_THREADS; i++) {
+			pthread_join(thr[i], NULL);
+	}
+	printf("Fim\n");
+	// setpriority(&thr, SCHED_FIFO, 1);
 	return 0;
 }
