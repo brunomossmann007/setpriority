@@ -8,16 +8,24 @@
 //volatile int running = 1;
 char *buffer = NULL;
 
-int index = 0;
+int pointer = 0;
 
+pthread_mutex
+
+pthread_mutex_init(&mutex, NULL);
 
 void *run(void *data)
-{ms
+{
 	int id = (int)data;
-	printf("Inicia thread %d\n", id);
+	char letra = 0x41 + id;
+	printf("Inicia thread %d\n", id, 0x41 + letra);
 
-	buffer[pointer] = 'A';
-	index++;
+while(pointer < BUFFER_SIZE){
+	buffer[pointer] =  letra;
+	pthread_mutex_lock(&mutex);
+	pointer++;
+	pthread_mutex_unlock(&mutex);
+}
 	return 0;
 }
 
@@ -92,22 +100,28 @@ int main(int argc, char **argv)
 	}
 
 	N_THREADS = atoi(argv[1]);
-	BUFFER_SIZE = atoi(argv[2]);
+	BUFFER_SIZE = atoi(argv[2]) * 1024;
 	POLICY_TYPE = atoi(argv[3]);
 	POLICY_PRIORITY = atoi(argv[4]);
 
-	pthread_t thr[N_THREADS];
-	buffer = (char*) malloc((sizeof(char)) * BUFFER_SIZE * 1024);
 
+
+	pthread_t thr[N_THREADS];
+	buffer = (char*) malloc((sizeof(char)) * BUFFER_SIZE);
+	memsen(buffer, 0, sizeof(char) * BUFFER_SIZE);
+	pthread_mutex_init(&mutex, NULL);
 	printf("Inicio: %d %d %d %d\n", N_THREADS, BUFFER_SIZE, POLICY_TYPE, POLICY_PRIORITY);
 
-	for(int i = 0; i < N_THREADS; i++) {
+	for(int i = 0; i < BUFFER_SIZE; i++) {
 			pthread_create(&thr[i], NULL, run, (void*)i) ;
 	}
 
-	for(int i = 0; i < N_THREADS; i++) {
+	for(int i = 0; i < BUFFER_SIZE; i++) {
 			pthread_join(thr[i], NULL);
 	}
+
+	free(buffer);
+
 	printf("Fim\n");
 	// setpriority(&thr, SCHED_FIFO, 1);
 	return 0;
